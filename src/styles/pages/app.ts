@@ -13,4 +13,16 @@ export const Header = styled('header', {
   width: '100%',
   maxWidth: 1180,
   margin: '0 auto',
+  display: 'flex',
+
+  variants: {
+    position: {
+      true: {
+        justifyContent: 'center',
+      },
+      false: {
+        justifyContent: 'space-between',
+      }
+    },
+  },
 })

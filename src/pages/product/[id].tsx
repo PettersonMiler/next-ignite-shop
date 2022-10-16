@@ -1,8 +1,8 @@
-import axios from "axios";
 import { GetStaticPaths, GetStaticProps } from "next"
 import Image from "next/future/image";
 import Head from "next/head";
 import { useState } from "react";
+import { useShoppingCart } from "use-shopping-cart";
 import Stripe from "stripe";
 import { stripe } from "../../lib/stripe";
 import { ImageContainer, ProductContainer, ProductDetails } from "../../styles/pages/product"
@@ -15,23 +15,29 @@ interface ProductProps {
     price: string
     description: string
     defaultPriceId: string
+    currency: string
+    unit_amount: number;
   }
 }
 
 export default function Product({ product }: ProductProps) {
+  const { addItem } = useShoppingCart()
   const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false);
 
   async function handleBuyButton() {
     try {
       setIsCreatingCheckoutSession(true);
+      console.log('product ->', product)
+      addItem({
+        id: product.id,
+        price_id: product.defaultPriceId,
+        name: product.name,
+        price: product.unit_amount,
+        currency: product.currency,
+        imageUrl: product.imageUrl
+      }, {count: 1})
 
-      const response = await axios.post('/api/checkout', {
-        priceId: product.defaultPriceId,
-      })
-
-      const { checkoutUrl } = response.data;
-
-      window.location.href = checkoutUrl;
+      window.location.href = "/";
     } catch (err) {
       setIsCreatingCheckoutSession(false);
 
@@ -57,7 +63,7 @@ export default function Product({ product }: ProductProps) {
           <p>{product.description}</p>
 
           <button disabled={isCreatingCheckoutSession} onClick={handleBuyButton}>
-            Comprar agora
+            Colocar na sacola
           </button>
         </ProductDetails>
       </ProductContainer>
@@ -80,7 +86,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({ para
   const product = await stripe.products.retrieve(productId, {
     expand: ['default_price']
   });
-
+  console.log('product', product)
   const price = product.default_price as Stripe.Price;
 
   return {
@@ -93,8 +99,10 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({ para
           style: 'currency',
           currency: 'BRL'
         }).format(price.unit_amount / 100),
+        unit_amount: price.unit_amount,
         description: product.description,
-        defaultPriceId: price.id
+        defaultPriceId: price.id,
+        currency: price.currency
       }
     },
     revalidate: 60 * 60 * 1 // 1 hours

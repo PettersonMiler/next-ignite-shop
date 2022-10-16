@@ -42,6 +42,11 @@ export const Product = styled('div', {
     opacity: 0,
     transition: 'all 0.2s ease-in-out',
 
+    div: {
+      display: 'inline-flex',
+      flexDirection: 'column',
+    },
+
     strong: {
       fontSize: '$lg',
       color: '$gray100',
@@ -59,5 +64,17 @@ export const Product = styled('div', {
       transform: 'translateY(0%)',
       opacity: 1
     }
+  }
+})
+
+export const Bag = styled('div', {
+  padding: '1rem',
+  backgroundColor: '$green500',
+  borderRadius: 6,
+  marginLeft: '0.5rem',
+  boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
+
+  '&:hover': {
+    backgroundColor: '$green300',
   }
 })
