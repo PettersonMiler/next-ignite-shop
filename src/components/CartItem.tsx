@@ -4,7 +4,7 @@ import {
   ProductContainer,
   ImageContainer,
   ProductDetails,
-} from "../../styles/components/cartItem";
+} from "../styles/components/cartItem";
 
 interface CartItem {
   id: string;

@@ -10,7 +10,6 @@ import {
   ProductContainer,
   ProductDetails,
 } from "../../styles/pages/product";
-import { useRouter } from "next/router";
 
 interface ProductProps {
   product: {
@@ -26,7 +25,6 @@ interface ProductProps {
 }
 
 export default function Product({ product }: ProductProps) {
-  const router = useRouter();
   const { addItem } = useShoppingCart();
   const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
     useState(false);
@@ -47,7 +45,7 @@ export default function Product({ product }: ProductProps) {
         { count: 1 }
       );
 
-      router.push("/");
+      window.location.href = "/";
     } catch (err) {
       setIsCreatingCheckoutSession(false);
 
@@ -99,7 +97,6 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
   const product = await stripe.products.retrieve(productId, {
     expand: ["default_price"],
   });
-  console.log("product", product);
   const price = product.default_price as Stripe.Price;
 
   return {

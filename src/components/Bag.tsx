@@ -1,10 +1,11 @@
+import { useState } from "react";
 import axios from "axios";
 import Image from "next/future/image";
-import { useState } from "react";
+import { useRouter } from "next/router";
 import { useShoppingCart } from "use-shopping-cart";
-import bagImg from "../../assets/bag-icon.svg";
-import closeImg from "../../assets/close-icon.svg";
-import CartItem from "../CartItem";
+import bagImg from "../assets/bag-icon.svg";
+import closeImg from "../assets/close-icon.svg";
+import CartItem from "./CartItem";
 import {
   Button,
   Content,
@@ -14,19 +15,17 @@ import {
   SideBar,
   CloseButton,
   Total,
-} from "../../styles/components/bag";
+} from "../styles/components/bag";
 
 function Bag() {
-  const { cartCount, cartDetails, formattedTotalPrice, ...rest } =
-    useShoppingCart();
+  const router = useRouter();
+
+  const { cartCount, cartDetails, formattedTotalPrice } = useShoppingCart();
   const [isOpen, setIsOpen] = useState(false);
   const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
     useState(false);
 
   const cart = Object.keys(cartDetails).map((key) => cartDetails[key]);
-  console.log("cart ->", cart);
-  console.log("rest ->", rest);
-
   const quantityLabel = (count: number) => {
     if (count === 0) return "Nenhum item na sacola";
 
@@ -46,11 +45,11 @@ function Bag() {
 
       const { checkoutUrl } = response.data;
 
-      window.location.href = checkoutUrl;
+      router.push(checkoutUrl);
     } catch (error) {
       setIsCreatingCheckoutSession(false);
 
-      console.log(error);
+      alert("Occoreu algum erro!");
     }
   };
 

@@ -1,11 +1,13 @@
+import { useEffect, useState } from "react";
 import { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/future/image";
 import { CartProvider } from "use-shopping-cart";
 import Bag from "../components/Bag";
+import LoadingSpinner from "../components/LoadingSpinner";
 import logoImg from "../assets/logo.svg";
-import { Container, Header } from "../styles/pages/app";
+import { Container, Header, LoaderContainer } from "../styles/pages/app";
 import { globalStyles } from "../styles/global";
 
 import "keen-slider/keen-slider.min.css";
@@ -17,7 +19,19 @@ const SUCCESS_URL = `${process.env.NEXT_PUBLIC_URL}/success?session_id={CHECKOUT
 const CANCEL_URL = process.env.NEXT_PUBLIC_URL;
 
 function App({ Component, pageProps }: AppProps) {
-  const { route } = useRouter();
+  const [loading, setLoading] = useState(false);
+  const { route, events } = useRouter();
+
+  useEffect(() => {
+    events.on("routeChangeStart", () => setLoading(true));
+    events.on("routeChangeComplete", () => setLoading(false));
+    events.on("routeChangeError", () => setLoading(false));
+    return () => {
+      events.off("routeChangeStart", () => setLoading(true));
+      events.off("routeChangeComplete", () => setLoading(false));
+      events.off("routeChangeError", () => setLoading(false));
+    };
+  }, [events]);
 
   return (
     <CartProvider
@@ -38,8 +52,13 @@ function App({ Component, pageProps }: AppProps) {
 
           {route !== "/success" && <Bag />}
         </Header>
-
-        <Component {...pageProps} />
+        {loading ? (
+          <LoaderContainer>
+            <LoadingSpinner size="lg" center />
+          </LoaderContainer>
+        ) : (
+          <Component {...pageProps} />
+        )}
       </Container>
     </CartProvider>
   );
